@@ -1,8 +1,10 @@
 # Cuarta entrega - Proyecto Final
+import pandas as pd
 import requests  #realiza solicitudes HTTP - hacer una solicitud GET a una API pública y obtener los datos en formato JSON.
 import psycopg2  # interactuar con bases de datos PostgreSQL. Conectarse a una base de datos Amazon Redshift (que está basada en PostgreSQL) 
                  #y realizar operaciones de base de datos como crear tablas e insertar datos.
 import smtplib
+
 #import sys
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -13,7 +15,7 @@ from datetime import datetime, timedelta
 #from airflow.operators.python_operator import PythonOperator
 
 # hora inicio
-print(f"inicio script: {datetime.now()}")
+print(f"inicio script: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 #variable Status finalizacion ETL bandera error 0 sin error - 1 con error
 eerror=0
 
@@ -412,8 +414,9 @@ for city_name, city_coords in cities_data.items():
                 #print(f'Error al conectarse a la API para la ciudad {city_name}. Código de estado:', response.status_code)
                 
                 # texto plano y/o HTML del cuerpo del mensaje
-                texto = """Inicio Status ETL,
-                Error al conectarse a la api 
+                texto = f"""Inicio Status ETL,
+                Error al conectarse a la api,
+                Fecha y hora {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
                 Fin Status ETL
                 """
                 mensaje.attach(MIMEText(texto, 'plain'))
@@ -460,13 +463,14 @@ insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),f
 cursor.close()
 conn.close()
 #print("Datos insertados correctamente.")
-insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),"Datos insertados correctamente.")
+#insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),"Datos insertados correctamente.")
 
 #enviar mail
 if eerror==0: 
     # texto plano y/o HTML del cuerpo del mensaje
-    texto = """Inicio Status ETL,
+    texto = f"""Inicio Status ETL,
     Finalizo correctamente 
+    Fecha y hora {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
     Fin Status ETL
     """
     mensaje.attach(MIMEText(texto, 'plain'))
@@ -480,13 +484,14 @@ if eerror==0:
             #print('Correo electrónico enviado correctamente.')
             insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),'Correo electrónico enviado correctamente.')
     except Exception as e:
-        #print(f'Error al enviar el correo electrónico: {e}')
-        insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),f'Error al enviar el correo electrónico: {e}')
+        print(f'Error al enviar el correo electrónico: {e}')
+        #insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),f'Error al enviar el correo electrónico: {e}')
  
 else: 
     # texto plano y/o HTML del cuerpo del mensaje
-    texto = """Inicio Status ETL,
+    texto = f"""Inicio Status ETL,
     Finalizo con error  
+    Fecha y hora {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
     Fin Status ETL
     """
     mensaje.attach(MIMEText(texto, 'plain'))
@@ -498,12 +503,13 @@ else:
             servidor.login(usuario, contraseña)
             servidor.sendmail(de, para, mensaje.as_string())
             #print('Correo electrónico enviado correctamente.')
-            insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),'Correo electrónico enviado correctamente.')
+         #   insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),'Correo electrónico enviado correctamente.')
     except Exception as e:
-        #print(f'Error al enviar el correo electrónico: {e}')
-        insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),f'Error al enviar el correo electrónico: {e}')
+        print(f'Error al enviar el correo electrónico: {e}')
+        print('Fin prg con error')
+        #insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),f'Error al enviar el correo electrónico: {e}')
 
-insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),'Fin ETL')
-        
+#insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),'Fin ETL')
+print('Fin prg ')        
 
 
