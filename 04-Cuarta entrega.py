@@ -459,11 +459,7 @@ cantidad_registros = cursor.fetchone()[0]
 #print(f"La tabla 'pronostico_clima' tiene {cantidad_registros} registros.")
 insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),f"La tabla 'pronostico_clima' tiene {cantidad_registros} registros.")
 
-# Cerrar la conexión
-cursor.close()
-conn.close()
-#print("Datos insertados correctamente.")
-#insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),"Datos insertados correctamente.")
+
 
 #enviar mail
 if eerror==0: 
@@ -511,5 +507,28 @@ else:
 
 #insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),'Fin ETL')
 print('Fin prg ')        
+#print("Datos insertados correctamente.")
+#insertar_logs(cursor, conn, datetime.now(), fecha_alta_proceso, datetime.now(),"Datos insertados correctamente.")
 
+
+#analisis de datos 
+# Consulta SQL para obtener los datos
+sql_query = "SELECT * FROM pronostico_clima;"
+#lectura
+df = pd.read_sql_query(sql_query, conn)
+
+type(df)
+df.shape
+df.head()
+df.tail()
+df.info()
+print (df.isnull().sum())
+print (df.notnull().sum())
+df.isna().sum()
+df.describe(include='all')
+df.describe().T
+
+# Cerrar la conexión
+cursor.close()
+conn.close()
 
